@@ -7,6 +7,8 @@ class App < Sinatra::Base
 
     # Funktion för att prata med databasen
     # Exempel på användning: db.execute('SELECT * FROM fruits')
+
+    
     def db
       return @db if @db
       @db = SQLite3::Database.new(DB_PATH)
@@ -19,5 +21,73 @@ class App < Sinatra::Base
     get '/' do
         erb :index
     end
+
+    get '/' do
+      @categories = db.execute('SELECT * FROM categories')
+      erb :"categories/index"
+    end
+
+    #Categories 
+
+    get '/categories/:id' do |id|
+      @category = db.execute(
+        'SELECT * FROM categories WHERE id = ?', [id]
+      ).first
+  
+      @threads = db.execute(
+        'SELECT * FROM threads WHERE category_id = ? ORDER BY id DESC', [id]
+      )
+  
+      erb :"categories/show"
+    end
+
+    #Threads 
+
+    get '/threads/:id' do |id|
+      @thread = db.execute(
+        'SELECT * FROM threads WHERE id = ?', [id]
+      ).first
+  
+      @posts = db.execute(<<~SQL, [id])
+        SELECT posts.content, users.username
+        FROM posts
+        JOIN users ON posts.user_id = users.id
+        WHERE posts.thread_id = ?
+        ORDER BY posts.id ASC
+      SQL
+  
+      erb :"threads/show"
+    end
+
+
+    get '/categories/:id/threads/new' do |id|
+      @category_id = id
+      erb :"threads/new"
+    end
+
+
+    post '/threads' do 
+      titel = params["titel"]
+      category_id = params["category_id"]
+
+      db.execute(
+        'INSERT INTO threads (titel, category_id) VALUES (?, ?)', 
+        [tiel, category_id]
+      )
+
+      redirect "categories/#{category_id}"
+    end 
+
+
+
+    post '/threads/:id/posts' do id 
+      content = params["content"]
+
+      db.execute(
+        'INSERT INTO posts (content, user_id, threads_id) VALUES (?, ?, ?)',
+        [content, 1, id]
+      )
+      redirect "/threads/#{id}"
+    end 
 
 end
