@@ -1,0 +1,10 @@
+<h1>Kategorier</h1>
+<ul>
+  <% @categories.each do |category| %>
+    <li>
+      <a href="/categories/<%= category['id'] %>">
+        <%= category['name'] %>
+      </a>
+    </li>
+  <% end %>
+</ul>

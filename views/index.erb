@@ -1,13 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projekt #2</title>
+    <title>Forum X</title>
     <link rel="stylesheet" type="text/css" href="/style.css?<%=Time.now.to_i%>">
 </head>
 <body>
-  <h1>Webbserverprogrammering 1 - Slutprojekt</h1>
-  <img src="/img/glhf.png">
+
+<header class="header">
+  <h1>Forum X</h1>
+  <p>Välkommen till vårt diskussionsforum</p>
+</header>
+
+<main class="container">
+
+  <h2>Kategorier</h2>
+  
+  <% @categories.each do |category| %>
+    <div class="category-box">
+      <a href="/categories/<%= category["id"] %>">
+        <%= category["name"] %>
+      </a>
+    </div>
+  <% end %>
+
+</main>
+
 </body>
 </html>

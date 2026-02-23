@@ -9,6 +9,7 @@ class App < Sinatra::Base
     # Exempel på användning: db.execute('SELECT * FROM fruits')
 
     
+    
     def db
       return @db if @db
       @db = SQLite3::Database.new(DB_PATH)
@@ -18,13 +19,10 @@ class App < Sinatra::Base
     end
 
     # Routen /
-    get '/' do
-        erb :index
-    end
 
     get '/' do
       @categories = db.execute('SELECT * FROM categories')
-      erb :"categories/index"
+      erb :"index"
     end
 
     #Categories 
@@ -67,12 +65,12 @@ class App < Sinatra::Base
 
 
     post '/threads' do 
-      titel = params["titel"]
+      title = params["title"]
       category_id = params["category_id"]
 
       db.execute(
-        'INSERT INTO threads (titel, category_id) VALUES (?, ?)', 
-        [tiel, category_id]
+        'INSERT INTO threads (title, category_id) VALUES (?, ?)', 
+        [title, category_id]
       )
 
       redirect "categories/#{category_id}"

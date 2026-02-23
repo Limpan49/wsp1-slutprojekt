@@ -1,1 +1,12 @@
-<h1>Forum X</h1>
+<h1>Skapa ny tråd</h1>
+
+<form action="/threads" method="post">
+  <input type="hidden" name="category_id" value="<%= @category_id %>">
+
+  <label>Titel:</label><br>
+  <input type="text" name="title" required><br><br>
+  <button type="submit">Skapa tråd</button>
+</form>
+
+<br>
+<a href="/categories/<%= @category_id %>">⬅ Tillbaka</a>

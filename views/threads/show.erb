@@ -1,0 +1,25 @@
+<h1><%= @thread["title"] %></h1>
+
+<a href="/categories/<%= @thread["category_id"] %>">
+  ⬅ Tillbaka till kategori
+</a>
+
+<hr>
+
+<h2>Inlägg</h2>
+
+<% @posts.each do |post| %>
+  <div style="border:1px solid black; padding:10px; margin-bottom:10px;">
+    <strong><%= post["username"] %></strong><br>
+    <%= post["content"] %>
+  </div>
+<% end %>
+
+<hr>
+
+<h3>Skriv nytt inlägg</h3>
+
+<form action="/threads/<%= @thread["id"] %>/posts" method="post">
+  <textarea name="content" rows="4" cols="50" required></textarea><br><br>
+  <button type="submit">Skicka</button>
+</form>
