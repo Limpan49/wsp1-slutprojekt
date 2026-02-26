@@ -73,7 +73,7 @@ class App < Sinatra::Base
         [title, category_id]
       )
 
-      redirect "categories/#{category_id}"
+      redirect "/categories/#{category_id}"
     end 
 
 
@@ -82,7 +82,7 @@ class App < Sinatra::Base
       content = params["content"]
 
       db.execute(
-        'INSERT INTO posts (content, user_id, threads_id) VALUES (?, ?, ?)',
+        'INSERT INTO posts (content, user_id, thread_id) VALUES (?, ?, ?)',
         [content, 1, id]
       )
       redirect "/threads/#{id}"
