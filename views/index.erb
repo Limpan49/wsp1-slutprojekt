@@ -1,30 +1,36 @@
 <main class="container">
 
-  <h2>Kategorier</h2>
+  <div class="top-bar">
+    <% if logged_in? %>
+      👋 Inloggad som <strong><%= current_user["username"] %></strong>
+      <a href="/logout">Logga ut</a>
+    <% else %>
+      <a href="/login">Logga in</a> |
+      <a href="/registrera">Registrera</a>
+    <% end %>
+  </div>
 
-  <% if @categories && @categories.any? %>
+  <h2>Forumets Kategorier</h2>
 
-    <div class="categories-list">
-      <% @categories.each do |category| %>
-        <div class="category-box">
-          <h3>
-            <a href="/categories/<%= category["id"] %>">
-              <%= category["name"] %>
-            </a>
-          </h3>
-        </div>
-      <% end %>
-    </div>
+  <% if @categories.any? %>
+    <% @categories.each do |category| %>
+      <div class="category-card">
+        <h3>
+          <a href="/categories/<%= category["id"] %>">
+            <%= category["name"] %>
+          </a>
+        </h3>
 
+        <% if logged_in? %>
+          <a class="new-thread-btn"
+             href="/categories/<%= category["id"] %>/threads/new">
+             ➕ Skapa ny tråd
+          </a>
+        <% end %>
+      </div>
+    <% end %>
   <% else %>
-
-    <p>Det finns inga kategorier ännu.</p>
-
+    <p>Inga kategorier ännu.</p>
   <% end %>
 
-  <div style="margin-bottom:20px;">
-  <a href="/users/login">Logga in</a> |
-  <a href="/users/register">Registrera</a>
-</div>
-
-</main> 
+</main>
