@@ -1,15 +1,30 @@
-
 <main class="container">
 
   <h2>Kategorier</h2>
-  
-  <% @categories.each do |category| %>
-    <div class="category-box">
-      <a href="/categories/<%= category["id"] %>">
-        <%= category["name"] %>
-      </a>
+
+  <% if @categories && @categories.any? %>
+
+    <div class="categories-list">
+      <% @categories.each do |category| %>
+        <div class="category-box">
+          <h3>
+            <a href="/categories/<%= category["id"] %>">
+              <%= category["name"] %>
+            </a>
+          </h3>
+        </div>
+      <% end %>
     </div>
+
+  <% else %>
+
+    <p>Det finns inga kategorier ännu.</p>
+
   <% end %>
 
-</main>
+  <div style="margin-bottom:20px;">
+  <a href="/users/login">Logga in</a> |
+  <a href="/users/register">Registrera</a>
+</div>
 
+</main> 
