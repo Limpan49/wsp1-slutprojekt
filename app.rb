@@ -18,6 +18,17 @@ class App < Sinatra::Base
       return @db
     end
 
+    helpers do
+      def current_user
+        return nil unless session[:user_id]
+        db.execute("SELECT * FROM users WHERE id = ?", [session[:user_id]]).first
+      end
+
+      def logged_in?
+        !!current_user
+      end
+    end
+
     # Routen /
 
     get '/' do
@@ -86,6 +97,25 @@ class App < Sinatra::Base
         [content, 1, id]
       )
       redirect "/threads/#{id}"
+    end 
+
+
+    get '/registrera' do
+      erb :"users/registrera"
+    end 
+
+    post '/registrera' do 
+      require 'bcrypt'
+
+      username = params[:username]
+      password = BCrypt::Password.create(params[:password])
+
+      db.execute(
+        "INSERT INTO users (username, password_digest) VALUES (?, ?)", 
+        [username, password]
+      )
+
+      redirect '/login'
     end 
 
 end
