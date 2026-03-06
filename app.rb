@@ -1,15 +1,13 @@
 require 'debug'
 require "awesome_print"
+require 'bcrypt'
 
 class App < Sinatra::Base
-  enable :session
+  enable :sessions
+  set :session_secret, "superhemligt_lösenord123"
 
     setup_development_features(self)
 
-    # Funktion för att prata med databasen
-    # Exempel på användning: db.execute('SELECT * FROM fruits')
-
-    
     
     def db
       return @db if @db
@@ -103,8 +101,6 @@ class App < Sinatra::Base
     end 
 
     post '/registrera' do 
-      require 'bcrypt'
-
       username = params[:username]
       password = BCrypt::Password.create(params[:password])
 
@@ -126,8 +122,6 @@ class App < Sinatra::Base
     end
     
     post '/login' do
-      require 'bcrypt'
-    
       user = db.execute(
         "SELECT * FROM users WHERE username = ?",
         [params[:username]]
