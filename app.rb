@@ -1,14 +1,18 @@
 require 'debug'
 require "awesome_print"
 require 'bcrypt'
+require 'securerandom'
 
 class App < Sinatra::Base
   enable :sessions
-  set :session_secret, "superhemligt_lösenord123"
+  configure do
+    enable :sessions
+    set :session_secret, SecureRandom.hex(64)
+  end
 
+  
     setup_development_features(self)
 
-    
     def db
       return @db if @db
       @db = SQLite3::Database.new(DB_PATH)
@@ -46,7 +50,8 @@ class App < Sinatra::Base
         'SELECT * FROM threads WHERE category_id = ? ORDER BY id DESC', [id]
       )
   
-      erb :"categories/show"
+      erb :"threads/show"
+      #erb :"category/show"
     end
 
     #Threads 
@@ -113,10 +118,6 @@ class App < Sinatra::Base
     end 
 
 
-
-
-
-
     get '/login' do
       erb :"users/login"
     end
@@ -134,6 +135,8 @@ class App < Sinatra::Base
         @error = "Fel användarnamn eller lösenord"
         erb :"users/login"
       end
+
+      db.execute("DELETE FROME USERS WHERE")
     end
     
     get '/logout' do

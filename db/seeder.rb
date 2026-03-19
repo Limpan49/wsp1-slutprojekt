@@ -62,8 +62,8 @@ class Seeder
     password1 = BCrypt::Password.create("1234")
     password2 = BCrypt::Password.create("1234")
 
-    db.execute("INSERT INTO users (username, password_digest) VALUES (?, ?)", ["Flashbackarn", "password2"])    
-    db.execute("INSERT INTO users (username, password_digest) VALUES (?, ?)", ["Anonym123", "password1"])
+    db.execute("INSERT INTO users (username, password_digest) VALUES (?, ?)", ["Flashbackarn", password2])    
+    db.execute("INSERT INTO users (username, password_digest) VALUES (?, ?)", ["Anonym123", password1])
 
     # Categories
     db.execute("INSERT INTO categories (name) VALUES ('Samhälle & Politik')")
