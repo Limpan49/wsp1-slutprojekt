@@ -1,3 +1,19 @@
+<h1><%= @category["name"] %></h1>
+
+<% @threads.each do |thread| %>
+  <div>
+    <a href="/threads/<%= thread["id"] %>">
+      <%= thread["title"] %>
+    </a>
+  </div>
+<% end %>
+
+<br>
 <a href="/categories/<%= @category["id"] %>/threads/new">
   ➕ Skapa ny tråd
 </a>
+
+<br>
+<br>
+<br>
+<a href="/">⬅ Tillbaka</a>
