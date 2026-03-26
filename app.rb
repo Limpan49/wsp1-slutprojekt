@@ -50,8 +50,8 @@ class App < Sinatra::Base
         'SELECT * FROM threads WHERE category_id = ? ORDER BY id DESC', [id]
       )
   
-      erb :"threads/show"
-      #erb :"category/show"
+      #erb :"threads/show"
+      erb :"category/show"
     end
 
     #Threads 
@@ -97,8 +97,10 @@ class App < Sinatra::Base
         'INSERT INTO posts (content, user_id, thread_id) VALUES (?, ?, ?)',
         [params["content"], current_user["id"], id]
       )
+
+      thread_id = db.last_insert_row_id
     
-      redirect "/threads/#{id}"
+      redirect "/threads/#{thread_id}"
     end
 
     get '/registrera' do
@@ -136,7 +138,7 @@ class App < Sinatra::Base
         erb :"users/login"
       end
 
-      db.execute("DELETE FROME USERS WHERE")
+      db.execute("DELETE FROM USERS WHERE")
     end
     
     get '/logout' do

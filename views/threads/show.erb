@@ -1,6 +1,6 @@
-<h1><%= @threads["title"] %></h1>
+<h1><%= @thread["title"] %></h1>
 
-<a href="/categories/<%= @threads["category_id"] %>">
+<a href="/categories/<%= @thread["category_id"] %>">
   ⬅ Tillbaka till kategorier
 </a>
 
@@ -19,7 +19,7 @@
 
 <h3>Skriv nytt inlägg</h3>
 
-<form action="/threads/<%= @threads["id"] %>/posts" method="post">
+<form action="/threads/<%= @thread["id"] %>/posts" method="post">
   <textarea name="content" rows="4" cols="50" required></textarea><br><br>
   <button type="submit">Skicka</button>
 </form>
