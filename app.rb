@@ -172,4 +172,30 @@ class App < Sinatra::Base
     end
 
 
+    post '/users/:id/tabort' do |id|
+      redirect '/login' unless logged_in?
+      halt 403 unless current_user["id"].to_i == id.to_i
+    
+      nuvarande = params[:nuvarande_losenord]
+      nytt = params[:nytt_losenord]
+      bekräfta = params[:bekrafta_nytt]
+
+      unless BCrypt::Password.new(current_user["password_digest"]) == nuvarande
+        @error = "Nuvarande lösenord är fel"
+        return erb :"users/tabort"
+      end
+
+      unless nytt == bekräfta
+        @error = "Nya lösenordet och bekräftelsen matchar inte"
+        return erb :"users/tabort"
+      end
+
+      nytt_hash = BCrypt::Password.create(nytt)
+      db.execute("UPDATE users SET password_digest = ? WHERE id = ?", [nytt_hash, id])
+
+      @success = "Lösenordet har uppdaterats!"
+      erb :"users/tabort"
+    end
+
+
 end

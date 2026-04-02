@@ -10,3 +10,26 @@
 </form>
 
 <a href="/">Avbryt</a>
+
+<h2>Byt lösenord</h2>
+
+<% if @error %>
+  <p style="color:red;"><%= @error %></p>
+<% end %>
+
+<% if @success %>
+  <p style="color:green;"><%= @success %></p>
+<% end %>
+
+<form action="/users/<%= current_user['id'] %>/tabort" method="post">
+  <label>Nuvarande lösenord:</label>
+  <input type="password" name="nuvarande_losenord" required><br>
+
+  <label>Nytt lösenord:</label>
+  <input type="password" name="nytt_losenord" required><br>
+
+  <label>Bekräfta nytt lösenord:</label>
+  <input type="password" name="bekrafta_nytt" required><br>
+
+  <input type="submit" value="Byt lösenord">
+</form>

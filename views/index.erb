@@ -4,11 +4,11 @@
     <% if logged_in? %>
       👋 Inloggad som <strong><%= current_user["username"] %></strong>
       <a href="/logout">Logga ut</a>
-      <a href="/users/tabort">Ta bort konto</a>   
+      <a href="/users/tabort">Ta bort / uppdatera konto</a>   
     <% else %>
       <a href="/login">Logga in</a> |
       <a href="/registrera">Registrera</a>
-      <a href="/users/tabort">Ta bort konto</a>    
+      <a href="/users/tabort">Ta bort / uppdatera konto</a>    
     <% end %>
   </div>
 
