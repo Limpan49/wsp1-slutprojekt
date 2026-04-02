@@ -138,12 +138,30 @@ class App < Sinatra::Base
         erb :"users/login"
       end
 
-      db.execute("DELETE FROM USERS WHERE")
+      db.execute("DELETE FROM users WHERE id = ?", [id])
+      #db.execute("DELETE FROM USERS WHERE")
     end
     
     get '/logout' do
       session.clear
       redirect '/'
     end
+
+    get '/users/tabort' do
+      redirect '/login' unless logged_in?
+      erb :"users/tabort"
+    end
+
+    post '/users/:id/tabort' do |id|
+      redirect '/login' unless logged_in?
+    
+      halt 403 unless current_user["id"].to_i == id.to_i
+    
+      db.execute("DELETE FROM users WHERE id = ?", [id])
+      session.clear
+    
+      redirect '/'
+    end
+
 
 end

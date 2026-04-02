@@ -1,0 +1,12 @@
+<h2>Ta bort konto</h2>
+
+<p>
+  Är du säker på att du vill ta bort kontot 
+  <strong><%= current_user["username"] %></strong>?
+</p>
+
+<form action="/users/<%= current_user["id"] %>/tabort" method="post">
+  <button type="submit">Ja, ta bort mitt konto</button>
+</form>
+
+<a href="/">Avbryt</a>
