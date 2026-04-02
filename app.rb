@@ -98,9 +98,7 @@ class App < Sinatra::Base
         [params["content"], current_user["id"], id]
       )
 
-      thread_id = db.last_insert_row_id
-    
-      redirect "/threads/#{thread_id}"
+      redirect "/threads/#{id}"
     end
 
     get '/registrera' do
@@ -129,6 +127,16 @@ class App < Sinatra::Base
         "SELECT * FROM users WHERE username = ?",
         [params[:username]]
       ).first
+
+      if user.nil?
+        @error = "Kontot finns inte"
+        return erb :"users/login"
+      end
+
+      if BCrypt::Password.new(user["password_digest"]) != params[:password]
+        @error = "Fel lösenord"
+        return erb :"users/login"
+      end
     
       if user && BCrypt::Password.new(user["password_digest"]) == params[:password]
         session[:user_id] = user["id"]
