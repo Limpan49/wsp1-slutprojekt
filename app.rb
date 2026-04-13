@@ -68,7 +68,9 @@ class App < Sinatra::Base
         WHERE posts.thread_id = ?
         ORDER BY posts.id ASC
       SQL
-  
+
+      @categories = db.execute("SELECT * FROM categories")
+
       erb :"threads/show"
     end
 
@@ -172,10 +174,10 @@ class App < Sinatra::Base
     end
 
 
-    post '/users/:id/tabort' do |id|
+    post '/users/:id/update_password' do |id|
       redirect '/login' unless logged_in?
       halt 403 unless current_user["id"].to_i == id.to_i
-    
+
       nuvarande = params[:nuvarande_losenord]
       nytt = params[:nytt_losenord]
       bekräfta = params[:bekrafta_nytt]
@@ -186,7 +188,7 @@ class App < Sinatra::Base
       end
 
       unless nytt == bekräfta
-        @error = "Nya lösenordet och bekräftelsen matchar inte"
+        @error = "Nya lösenorden matchar inte"
         return erb :"users/tabort"
       end
 
@@ -196,6 +198,5 @@ class App < Sinatra::Base
       @success = "Lösenordet har uppdaterats!"
       erb :"users/tabort"
     end
-
 
 end

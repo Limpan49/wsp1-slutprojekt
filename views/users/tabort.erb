@@ -21,7 +21,7 @@
   <p style="color:green;"><%= @success %></p>
 <% end %>
 
-<form action="/users/<%= current_user['id'] %>/tabort" method="post">
+<form action="/users/<%= current_user['id'] %>/update_password" method="post">
   <label>Nuvarande lösenord:</label>
   <input type="password" name="nuvarande_losenord" required><br>
 

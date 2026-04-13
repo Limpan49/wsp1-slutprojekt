@@ -15,6 +15,7 @@ class Seeder
     db.execute("DROP TABLE IF EXISTS threads")
     db.execute("DROP TABLE IF EXISTS categories")
     db.execute("DROP TABLE IF EXISTS users")
+    db.exicute("DROP TABLE IF EXISTS post_categories")
   end
 
   def self.create_tables
@@ -54,6 +55,18 @@ class Seeder
         FOREIGN KEY(thread_id) REFERENCES threads(id)
       );
     SQL
+
+    db.execute <<~SQL
+      CREATE TABLE post_categories (
+        post_id INTEGER,
+        category_id INTEGER,
+        PRIMARY KEY (post_id, category_id),
+        FOREIGN KEY(post_id) REFERENCES posts(id),
+        FOREIGN KEY(category_id) REFERENCES categories(id)
+      );
+    SQL
+
+
   end
 
   def self.populate_tables
