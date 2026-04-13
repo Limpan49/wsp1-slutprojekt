@@ -1,21 +1,22 @@
 require 'sqlite3'
-require_relative '../config'
+require_relative '../config' 
+require 'bcrypt'
+
 
 class Seeder
   def self.seed!
-    puts "Using db file: #{DB_PATH}"
     drop_tables
     create_tables
     populate_tables
-    puts "✅ Forum-databas seedad!"
+    puts "✅ Forum-databas seedad HALLÖÖ!"
   end
 
   def self.drop_tables
+    db.execute("DROP TABLE IF EXISTS post_categories")
     db.execute("DROP TABLE IF EXISTS posts")
     db.execute("DROP TABLE IF EXISTS threads")
     db.execute("DROP TABLE IF EXISTS categories")
     db.execute("DROP TABLE IF EXISTS users")
-    db.exicute("DROP TABLE IF EXISTS post_categories")
   end
 
   def self.create_tables
@@ -61,45 +62,35 @@ class Seeder
         post_id INTEGER,
         category_id INTEGER,
         PRIMARY KEY (post_id, category_id),
-        FOREIGN KEY(post_id) REFERENCES posts(id),
-        FOREIGN KEY(category_id) REFERENCES categories(id)
+        FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
+        FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE CASCADE
       );
     SQL
-
-
   end
 
   def self.populate_tables
-    # Users
-    require 'bcrypt'
-    password1 = BCrypt::Password.create("1234")
-    password2 = BCrypt::Password.create("1234")
+    password = BCrypt::Password.create("1234")
+    db.execute("INSERT INTO users (username, password_digest) VALUES (?, ?)", ["Flashbackarn", password])
+    db.execute("INSERT INTO users (username, password_digest) VALUES (?, ?)", ["Anonym123", password])
 
-    db.execute("INSERT INTO users (username, password_digest) VALUES (?, ?)", ["Flashbackarn", password2])    
-    db.execute("INSERT INTO users (username, password_digest) VALUES (?, ?)", ["Anonym123", password1])
+    ["Samhälle & Politik", "Ekonomi", "Teknik", "Livsstil", "Nöje"].each do |name|
+      db.execute("INSERT INTO categories (name) VALUES (?)", [name])
+    end
 
-    # Categories
-    db.execute("INSERT INTO categories (name) VALUES ('Samhälle & Politik')")
-    db.execute("INSERT INTO categories (name) VALUES ('Ekonomi & Karriär')")
-    db.execute("INSERT INTO categories (name) VALUES ('Teknik & Internet')")
-    db.execute("INSERT INTO categories (name) VALUES ('Livsstil & Relationer')")
-    db.execute("INSERT INTO categories (name) VALUES ('Nöje & Allmänt')")
+    # Skapa en tråd
+    db.execute("INSERT INTO threads (title, category_id, user_id) VALUES (?, ?, ?)", ["Valet 2026", 1, 1])
+    
+    # Skapa ett inlägg
+    db.execute("INSERT INTO posts (content, user_id, thread_id) VALUES (?, ?, ?)", ["Det här valet blir spännande!", 1, 1])
+    post_id = db.last_insert_row_id
 
-    # Threads
-    db.execute("INSERT INTO threads (title, category_id, user_id) VALUES (?, ?, ?)", ["Valet 2026", 1, 1]) 
-    db.execute("INSERT INTO threads (title, category_id, user_id) VALUES (?, ?, ?)", ["Bästa Linux-distron?", 1, 1])
-
-    # Posts
-    db.execute("INSERT INTO posts (content, user_id, thread_id)
-                VALUES ('Det här valet blir intressant...', 1, 1)")
-    db.execute("INSERT INTO posts (content, user_id, thread_id)
-                VALUES ('Jag kör Arch btw', 2, 2)")
+    db.execute("INSERT INTO post_categories (post_id, category_id) VALUES (?, ?)", [post_id, 1]) 
+    db.execute("INSERT INTO post_categories (post_id, category_id) VALUES (?, ?)", [post_id, 2]) 
   end
 
   def self.db
-    @db ||= SQLite3::Database.new(DB_PATH).tap do |db|
-      db.results_as_hash = true
-    end
+    @db ||= SQLite3::Database.new(DB_PATH).tap { |d| 
+    d.results_as_hash = true }
   end
 end
 

@@ -1,19 +1,24 @@
-<h1><%= @category["name"] %></h1>
+<h1>Kategori: <%= @category["name"] %></h1>
 
-<% @threads.each do |thread| %>
-  <div>
-    <a href="/threads/<%= thread["id"] %>">
-      <%= thread["title"] %>
-    </a>
-  </div>
-<% end %>
+<div class="posts-list">
+  <% if @posts && @posts.any? %>
+    <% @posts.each do |post| %>
+      <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+        <h3>
+          Tråd: <a href="/threads/<%= post['thread_id'] %>"><%= post['title'] %></a>
+        </h3>
+        <p><%= post['content'] %></p>
+        <small>Postat av: <%= post['username'] %></small>
+      </div>
+    <% end %>
+  <% else %>
+    <p>Inga inlägg i denna kategori än.</p>
+  <% end %>
+</div>
 
 <br>
 <a href="/categories/<%= @category["id"] %>/threads/new">
   ➕ Skapa ny tråd
 </a>
-
-<br>
-<br>
-<br>
+<br><br>
 <a href="/">⬅ Tillbaka</a>

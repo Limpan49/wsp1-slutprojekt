@@ -42,18 +42,40 @@ class App < Sinatra::Base
     #Categories 
 
     get '/categories/:id' do |id|
-      @category = db.execute(
-        'SELECT * FROM categories WHERE id = ?', [id]
-      ).first
-  
-      @threads = db.execute(
-        'SELECT * FROM threads WHERE category_id = ? ORDER BY id DESC', [id]
-      )
-  
-      #erb :"threads/show"
+      @category = db.execute('SELECT * FROM categories WHERE id = ?', [id]).first
+      @posts = db.execute(<<-SQL, [id])
+        SELECT posts.*, users.username, threads.title
+        FROM posts
+        JOIN post_categories ON posts.id = post_categories.post_id
+        JOIN users ON posts.user_id = users.id
+        JOIN threads ON posts.thread_id = threads.id
+        WHERE post_categories.category_id = ?
+        ORDER BY posts.id DESC
+      SQL
       erb :"category/show"
     end
-
+    
+    post '/threads/:id/posts' do |id|
+      redirect '/login' unless logged_in?
+    
+      db.execute(
+        'INSERT INTO posts (content, user_id, thread_id) VALUES (?, ?, ?)',
+        [params["content"], current_user["id"], id]
+      )
+      post_id = db.last_insert_row_id
+    
+      if params["category_ids"]
+        params["category_ids"].each do |cat_id|
+          db.execute(
+            "INSERT INTO post_categories (post_id, category_id) VALUES (?, ?)",
+            [post_id, cat_id]
+          )
+        end
+      end
+    
+      redirect "/threads/#{id}"
+    end
+    
     #Threads 
 
     get '/threads/:id' do |id|
@@ -82,13 +104,29 @@ class App < Sinatra::Base
 
     post '/threads' do
       redirect '/login' unless logged_in?
+
+      category_id = params["category_id"]
+      title = params["title"]
+      user_id = current_user["id"]
     
       db.execute(
         'INSERT INTO threads (title, category_id, user_id) VALUES (?, ?, ?)', 
-        [params["title"], params["category_id"], current_user["id"]]
+        [title, category_id, user_id]
       )
-    
-      redirect "/categories/#{params["category_id"]}"
+      thread_id = db.last_insert_row_id
+
+      db.execute(
+        'INSERT INTO posts (content, user_id, thread_id) VALUES (?, ?, ?)',
+        ["Välkommen till tråden: #{title}", user_id, thread_id]
+      )
+      post_id = db.last_insert_row_id
+
+      db.execute(
+        "INSERT INTO post_categories (post_id, category_id) VALUES (?, ?)",
+        [post_id, category_id]
+      )
+
+      redirect "/categories/#{category_id}"
     end
 
 
@@ -99,7 +137,17 @@ class App < Sinatra::Base
         'INSERT INTO posts (content, user_id, thread_id) VALUES (?, ?, ?)',
         [params["content"], current_user["id"], id]
       )
-
+    
+      post_id = db.last_insert_row_id
+    
+      if params["category_ids"]
+        params["category_ids"].each do |cat_id|
+          db.execute(
+            "INSERT INTO post_categories (post_id, category_id) VALUES (?, ?)",
+            [post_id, cat_id]
+          )
+        end
+      end
       redirect "/threads/#{id}"
     end
 
