@@ -8,7 +8,9 @@ class ForumThread
       "INSERT INTO threads (title, category_id, user_id) VALUES (?, ?, ?)",
       [title, category_id, user_id]
     )
+    db.last_insert_row_id
   end
+  
 
   def self.posts(db, id)
     db.execute(<<~SQL, [id])
