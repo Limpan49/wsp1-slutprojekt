@@ -10,15 +10,8 @@ class ForumThread
     )
     db.last_insert_row_id
   end
-  
 
-  def self.posts(db, id)
-    db.execute(<<~SQL, [id])
-      SELECT posts.id, posts.content, users.username
-      FROM posts
-      JOIN users ON posts.user_id = users.id
-      WHERE posts.thread_id = ?
-      ORDER BY posts.id ASC
-    SQL
+  def self.posts(db, thread_id)
+    db.execute("SELECT * FROM posts WHERE thread_id = ?", [thread_id])
   end
 end

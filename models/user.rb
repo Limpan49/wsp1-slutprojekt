@@ -13,4 +13,14 @@ class User
       [username, password_digest]
     )
   end
+
+  def self.delete(db, id)
+    db.execute("DELETE FROM users WHERE id = ?", [id])
+  end
+  
+  def self.update_password(db, id, new_digest)
+    db.execute("UPDATE users SET password_digest = ? WHERE id = ?", [new_digest, id])
+  end
 end
+
+

@@ -7,6 +7,7 @@ require_relative 'models/user'
 require_relative 'models/category'
 require_relative 'models/forum_thread'
 require_relative 'models/post'
+require_relative 'models/post_category'
 
 ##
 # Huvudklassen för Sinatra applikationen.
@@ -88,7 +89,6 @@ class App < Sinatra::Base
   # @return [ERB] index sidan
   #
   get '/' do
-    @categories = Category.all(db)
     erb :"index"
   end
 
@@ -103,17 +103,7 @@ class App < Sinatra::Base
   get '/categories/:id' do |id|
     @category = Category.find(db, id)
     @threads  = Category.threads(db, id)
-
-    @posts = db.execute(<<~SQL, [id])
-      SELECT posts.*, users.username, threads.title
-      FROM posts
-      JOIN post_categories ON posts.id = post_categories.post_id
-      JOIN users ON posts.user_id = users.id
-      JOIN threads ON posts.thread_id = threads.id
-      WHERE post_categories.category_id = ?
-      ORDER BY posts.id DESC
-    SQL
-
+    @posts    = Category.posts(db, id)
     erb :"category/show"
   end
 
@@ -159,13 +149,9 @@ class App < Sinatra::Base
     user_id     = current_user["id"]
 
     thread_id = ForumThread.create(db, title, category_id, user_id)
+    post_id   = Post.create(db, "Välkommen till tråden: #{title}", user_id, thread_id)
 
-    post_id = Post.create(db, "Välkommen till tråden: #{title}", user_id, thread_id)
-
-    db.execute(
-      "INSERT INTO post_categories (post_id, category_id) VALUES (?, ?)",
-      [post_id, category_id]
-    )
+    PostCategory.add(db, post_id, category_id)
 
     redirect "/categories/#{category_id}"
   end
@@ -185,10 +171,7 @@ class App < Sinatra::Base
 
     if params["category_ids"]
       params["category_ids"].each do |cat_id|
-        db.execute(
-          "INSERT INTO post_categories (post_id, category_id) VALUES (?, ?)",
-          [post_id, cat_id]
-        )
+        PostCategory.add(db, post_id, cat_id)
       end
     end
 
@@ -293,7 +276,7 @@ class App < Sinatra::Base
     redirect '/login' unless logged_in?
     halt 403 unless current_user["id"].to_i == id.to_i
 
-    db.execute("DELETE FROM users WHERE id = ?", [id])
+    User.delete(db, id)
     session.clear
 
     redirect '/'
@@ -326,7 +309,7 @@ class App < Sinatra::Base
     end
 
     nytt_hash = BCrypt::Password.create(nytt)
-    db.execute("UPDATE users SET password_digest = ? WHERE id = ?", [nytt_hash, id])
+    User.update_password(db, id, nytt_hash)
 
     @success = "Lösenordet har uppdaterats!"
     erb :"users/tabort"
