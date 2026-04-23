@@ -14,7 +14,6 @@ require_relative 'models/post_category'
 # Hanterar routing, sessions, autentisering och rendering av views.
 #
 class App < Sinatra::Base
-  försök = 3
   enable :sessions
 
   configure do
@@ -87,8 +86,6 @@ class App < Sinatra::Base
   #
   # Visar startsidan med alla kategorier.
   #
-  # @return [ERB] index sidan
-  #
   get '/' do
     erb :"index"
   end
@@ -97,9 +94,6 @@ class App < Sinatra::Base
   # GET /categories/:id
   #
   # Visar en kategori, dess trådar och alla inlägg kopplade via post_categories.
-  #
-  # @param id [Integer] kategori-ID
-  # @return [ERB] kategori sidan
   #
   get '/categories/:id' do |id|
     @category = Category.find(db, id)
@@ -113,9 +107,6 @@ class App < Sinatra::Base
   #
   # Visar en tråd och alla dess inlägg.
   #
-  # @param id [Integer] tråd-ID
-  # @return [ERB] tråd sidan
-  #
   get '/threads/:id' do |id|
     @thread = ForumThread.find(db, id)
     @posts  = ForumThread.posts(db, id)
@@ -127,9 +118,6 @@ class App < Sinatra::Base
   #
   # Visar formulär för att skapa en ny tråd i en kategori.
   #
-  # @param id [Integer] kategori ID
-  # @return [ERB] formulärsidan
-  #
   get '/categories/:id/threads/new' do |id|
     @category_id = id
     erb :"threads/new"
@@ -139,8 +127,6 @@ class App < Sinatra::Base
   # POST /threads
   #
   # Skapar en ny tråd och ett första inlägg.
-  #
-  # @return [Redirect] redirect till kategorisidan
   #
   post '/threads' do
     redirect '/login' unless logged_in?
@@ -162,9 +148,6 @@ class App < Sinatra::Base
   #
   # Skapar ett nytt inlägg i en tråd.
   #
-  # @param id [Integer] tråd ID
-  # @return [Redirect] redirect till tråden
-  #
   post '/threads/:id/posts' do |id|
     redirect '/login' unless logged_in?
 
@@ -182,20 +165,12 @@ class App < Sinatra::Base
   ##
   # GET /registrera
   #
-  # Visar registreringsformuläret.
-  #
-  # @return [ERB] registreringssidan
-  #
   get '/registrera' do
     erb :"users/registrera"
   end
 
   ##
   # POST /registrera
-  #
-  # Skapar ett nytt användarkonto.
-  #
-  # @return [Redirect] redirect till login
   #
   post '/registrera' do
     username = params[:username]
@@ -209,37 +184,58 @@ class App < Sinatra::Base
   ##
   # GET /login
   #
-  # Visar login-formuläret.
-  #
-  # @return [ERB] login sidan
-  #
   get '/login' do
     erb :"users/login"
   end
 
-  #
+  ##
   # POST /login
   #
-  # Loggar in en användare om lösenordet stämmer.
-  #
-  # @return [Redirect, ERB] redirect vid lyckad inloggning, annars login sidan
+  # Inloggning med cooldown och att logging
   #
   post '/login' do
+    # Cooldown aktiv?
+    if session[:cooldown_until] && Time.now < session[:cooldown_until]
+      @error = "För många misslyckade försök. Försök igen om en stund."
+      return erb :"users/login"
+    end
+
+    # Initiera räknaren
+    session[:login_attempts] ||= 0
+
     user = User.find_by_username(db, params[:username])
 
+    # Okänt konto kanske
     if user.nil?
+      session[:login_attempts] += 1
+      puts "[LOGIN-LOG] Misslyckat försök: okänt konto (#{session[:login_attempts]} försök)"
+
+      if session[:login_attempts] >= 3
+        session[:cooldown_until] = Time.now + 30
+        return erb :'users/förmångaförsök'
+      end
+
       @error = "Kontot finns inte"
       return erb :"users/login"
     end
 
+    # Fel lösenord
     unless BCrypt::Password.new(user["password_digest"]) == params[:password]
-      @error = "Fel lösenord"
-      försök -= 1
-      if försök == 0
+      session[:login_attempts] += 1
+      puts "[LOGIN-LOG] Misslyckat försök för användare #{user["username"]} (#{session[:login_attempts]} försök)"
+
+      if session[:login_attempts] >= 3
+        session[:cooldown_until] = Time.now + 30
         return erb :'users/förmångaförsök'
       end
+
+      @error = "Fel lösenord"
       return erb :"users/login"
     end
+
+    # Lyckad inloggning dvs återställ
+    session[:login_attempts] = 0
+    session[:cooldown_until] = nil
 
     session[:user_id] = user["id"]
     redirect '/'
@@ -247,10 +243,6 @@ class App < Sinatra::Base
 
   ##
   # GET /logout
-  #
-  # Loggar ut användaren.
-  #
-  # @return [Redirect] redirect till startsidan
   #
   get '/logout' do
     session.clear
@@ -260,10 +252,6 @@ class App < Sinatra::Base
   ##
   # GET /users/tabort
   #
-  # Visar sidan för att ta bort konto.
-  #
-  # @return [ERB] tabort sidan
-  #
   get '/users/tabort' do
     redirect '/login' unless logged_in?
     erb :"users/tabort"
@@ -271,11 +259,6 @@ class App < Sinatra::Base
 
   ##
   # POST /users/:id/tabort
-  #
-  # Tar bort användarens konto.
-  #
-  # @param id [Integer] användar ID
-  # @return [Redirect] redirect till startsidan
   #
   post '/users/:id/tabort' do |id|
     redirect '/login' unless logged_in?
@@ -289,11 +272,6 @@ class App < Sinatra::Base
 
   ##
   # POST /users/:id/update_password
-  #
-  # Uppdaterar användarens lösenord.
-  #
-  # @param id [Integer] användar ID
-  # @return [ERB] tabort sidan med success/error
   #
   post '/users/:id/update_password' do |id|
     redirect '/login' unless logged_in?
