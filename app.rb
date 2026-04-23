@@ -14,6 +14,7 @@ require_relative 'models/post_category'
 # Hanterar routing, sessions, autentisering och rendering av views.
 #
 class App < Sinatra::Base
+  försök = 3
   enable :sessions
 
   configure do
@@ -216,7 +217,7 @@ class App < Sinatra::Base
     erb :"users/login"
   end
 
-  ##
+  #
   # POST /login
   #
   # Loggar in en användare om lösenordet stämmer.
@@ -233,6 +234,10 @@ class App < Sinatra::Base
 
     unless BCrypt::Password.new(user["password_digest"]) == params[:password]
       @error = "Fel lösenord"
+      försök -= 1
+      if försök == 0
+        return erb :'users/förmångaförsök'
+      end
       return erb :"users/login"
     end
 

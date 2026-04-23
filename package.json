@@ -1,0 +1,26 @@
+{
+  "name": "wsp1-slutprojekt",
+  "version": "1.0.0",
+  "description": "Enskillt slutprojekt under hela vårterminen 2025 i kursen Webbserverprogrammering 1 på NTI Johanneberg.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Limpan49/wsp1-slutprojekt.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Limpan49/wsp1-slutprojekt/issues"
+  },
+  "homepage": "https://github.com/Limpan49/wsp1-slutprojekt#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^25.6.0"
+  }
+}
