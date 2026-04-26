@@ -2,7 +2,7 @@
 
   <div class="top-bar">
     <% if logged_in? %>
-      👋 Inloggad som <strong><%= current_user["username"] %></strong>
+      👋 Inloggad som <strong><%= h current_user["username"] %></strong>
       <a href="/logout">Logga ut</a>
       <a href="/users/tabort">Ta bort / uppdatera konto</a>   
     <% else %>
@@ -19,7 +19,7 @@
       <div class="category-card">
         <h3>
           <a href="/categories/<%= category["id"] %>">
-            <%= category["name"] %>
+            <%= h category["name"] %>
           </a>
         </h3>
 

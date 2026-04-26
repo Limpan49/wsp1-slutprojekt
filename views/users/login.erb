@@ -1,7 +1,7 @@
 <h2>Logga in</h2>
 
 <% if @error %>
-  <p style="color:red;"><%= @error %></p>
+  <p style="color:red;"><%= h @error %></p>
 <% end %>
 
 <form method="post" action="/login">

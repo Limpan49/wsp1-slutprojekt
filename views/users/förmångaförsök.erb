@@ -1,1 +1,5 @@
-  <h2>Lugna dig!</h2>  
+<h2>Lugna dig!</h2>
+
+<% if @error %>
+  <p style="color:red;"><%= h @error %></p>
+<% end %>

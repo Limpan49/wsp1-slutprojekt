@@ -1,10 +1,10 @@
-<h2>Tråd: <%= @thread['title'] %></h2>
+<h2>Tråd: <%= h @thread['title'] %></h2>
 
 <div class="posts">
   <% @posts.each do |post| %>
     <div style="border: 1px solid #eee; padding: 10px; margin-bottom: 5px;">
-      <strong><%= post['username'] %>:</strong>
-      <p><%= post['content'] %></p>
+      <strong><%= h post['username'] %>:</strong>
+      <p><%= h post['content'] %></p>
     </div>
   <% end %>
 </div>
@@ -16,10 +16,9 @@
   <label>Ditt svar:</label><br>
   <textarea name="content" required style="width: 100%; height: 100px;"></textarea><br>
 
-
   <% @categories.each do |category| %>
     <input type="checkbox" name="category_ids[]" value="<%= category['id'] %>" id="cat_<%= category['id'] %>">
-    <label for="cat_<%= category['id'] %>"><%= category['name'] %></label><br>
+    <label for="cat_<%= category['id'] %>"><%= h category['name'] %></label><br>
   <% end %>
 
   <br>

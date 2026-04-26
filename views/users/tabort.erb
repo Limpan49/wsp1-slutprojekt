@@ -1,8 +1,8 @@
 <h2>Ta bort konto</h2>
 
 <p>
-  Är du säker på att du vill ta bort kontot 
-  <strong><%= current_user["username"] %></strong>?
+  Är du säker på att du vill ta bort kontot
+  <strong><%= h current_user["username"] %></strong>?
 </p>
 
 <form action="/users/<%= current_user["id"] %>/tabort" method="post">
@@ -14,11 +14,11 @@
 <h2>Byt lösenord</h2>
 
 <% if @error %>
-  <p style="color:red;"><%= @error %></p>
+  <p style="color:red;"><%= h @error %></p>
 <% end %>
 
 <% if @success %>
-  <p style="color:green;"><%= @success %></p>
+  <p style="color:green;"><%= h @success %></p>
 <% end %>
 
 <form action="/users/<%= current_user['id'] %>/update_password" method="post">

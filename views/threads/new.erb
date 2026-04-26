@@ -1,7 +1,7 @@
 <h1>Skapa ny tråd</h1>
 
 <form action="/threads" method="post">
-  <input type="hidden" name="category_id" value="<%= @category_id %>">
+  <input type="hidden" name="category_id" value="<%= h @category_id %>">
 
   <label>Titel:</label><br>
   <input type="text" name="title" required><br><br>

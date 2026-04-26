@@ -1,7 +1,12 @@
 <h2>Registrera</h2>
 
+<% if @error %>
+  <p style="color:red;"><%= h @error %></p>
+<% end %>
+
 <form method="post" action="/registrera">
   <input type="text" name="username" placeholder="Användarnamn" required><br><br>
   <input type="password" name="password" placeholder="Lösenord" required><br><br>
+  <input type="password" name="password_confirm" placeholder="Bekräfta lösenord" required><br><br>
   <button>Skapa konto</button>
 </form>
